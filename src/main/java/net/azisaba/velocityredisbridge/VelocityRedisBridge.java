@@ -13,6 +13,9 @@ import lombok.Getter;
 import net.azisaba.velocityredisbridge.cache.CacheContainer;
 import net.azisaba.velocityredisbridge.config.VelocityRedisBridgeConfig;
 import net.azisaba.velocityredisbridge.listener.BungeeCordPluginMessageReceiveListener;
+import net.azisaba.velocityredisbridge.redis.IpDataHandler;
+import net.azisaba.velocityredisbridge.redis.RedisMessageSubscriber;
+import net.azisaba.velocityredisbridge.redis.RedisPlayerDataHandler;
 import net.azisaba.velocityredisbridge.redis.ServerUniqueIdDefiner;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -35,6 +38,8 @@ public class VelocityRedisBridge {
   private VelocityRedisBridgeConfig velocityRedisBridgeConfig;
   private CacheContainer cacheContainer;
 
+  private RedisMessageSubscriber redisMessageSubscriber;
+
   @Inject
   public VelocityRedisBridge(ProxyServer server, Logger logger) {
     this.proxy = server;
@@ -55,13 +60,30 @@ public class VelocityRedisBridge {
 
     String uniqueId = new ServerUniqueIdDefiner(jedisPool).define();
 
-    cacheContainer = new CacheContainer(this, jedisPool, uniqueId);
+    RedisPlayerDataHandler playerHandler = new RedisPlayerDataHandler(this, jedisPool, uniqueId);
+    IpDataHandler ipDataHandler = new IpDataHandler(this, jedisPool, uniqueId);
+
+    cacheContainer = new CacheContainer(this, playerHandler, ipDataHandler);
     proxy.getEventManager().register(this, new BungeeCordPluginMessageReceiveListener(this));
+
+    redisMessageSubscriber = new RedisMessageSubscriber(this, jedisPool);
+    redisMessageSubscriber.subscribe();
 
     proxy
         .getScheduler()
         .buildTask(this, () -> cacheContainer.updateCache())
-        .repeat(10, TimeUnit.SECONDS)
+        .repeat(getVelocityRedisBridgeConfig().getCacheUpdateIntervalSeconds(), TimeUnit.SECONDS)
+        .schedule();
+
+    proxy
+        .getScheduler()
+        .buildTask(
+            this,
+            () -> {
+              playerHandler.update();
+              ipDataHandler.update();
+            })
+        .repeat(getVelocityRedisBridgeConfig().getCacheUpdateIntervalSeconds(), TimeUnit.SECONDS)
         .schedule();
 
     api = new VelocityRedisBridgeAPI(this, jedisPool);

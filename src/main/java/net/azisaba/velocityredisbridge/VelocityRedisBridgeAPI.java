@@ -29,7 +29,7 @@ public class VelocityRedisBridgeAPI {
       plugin
           .getProxy()
           .getServer(serverName)
-          .ifPresent(server -> player.get().createConnectionRequest(server));
+          .ifPresent(server -> player.get().createConnectionRequest(server).connect());
       return;
     }
 
@@ -52,6 +52,10 @@ public class VelocityRedisBridgeAPI {
     }
 
     plugin.getProxy().getServer(serverName).ifPresent(player::createConnectionRequest);
+    plugin
+        .getProxy()
+        .getServer(serverName)
+        .ifPresent(server -> player.createConnectionRequest(server).connect());
   }
 
   /**

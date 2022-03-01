@@ -23,4 +23,14 @@ public class UnifiedIPCache {
     }
     return map;
   }
+
+  public void setIp(UUID uuid, String ip, int port) {
+    ipMap.put(uuid, ip);
+    portMap.put(uuid, port);
+  }
+
+  public void removeIp(UUID uuid) {
+    ipMap.remove(uuid);
+    portMap.remove(uuid);
+  }
 }

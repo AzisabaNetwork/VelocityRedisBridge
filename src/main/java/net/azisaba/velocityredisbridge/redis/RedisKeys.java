@@ -17,7 +17,8 @@ public enum RedisKeys {
   SEND_MESSAGE_TO_PLAYER("velocity-redis-bridge:send-message-to-player"),
   SEND_RAW_MESSAGE_TO_ALL("velocity-redis-bridge:send-raw-message-to-all"),
   SEND_RAW_MESSAGE_TO_PLAYER("velocity-redis-bridge:send-raw-message-to-player"),
-  KICK_PLAYER("velocity-redis-bridge:kick-player");
+  KICK_PLAYER("velocity-redis-bridge:kick-player"),
+  INFO_UPDATE_NOTIFY("velocity-redis-bridge:info-update-notify");
 
   @Getter private final String key;
 

@@ -3,21 +3,17 @@ package net.azisaba.velocityredisbridge.cache;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
 import net.azisaba.velocityredisbridge.VelocityRedisBridge;
-import net.azisaba.velocityredisbridge.redis.IpDataFetcher;
+import net.azisaba.velocityredisbridge.redis.IpDataHandler;
 import net.azisaba.velocityredisbridge.redis.RedisPlayerDataHandler;
-import redis.clients.jedis.JedisPool;
 
 @RequiredArgsConstructor
 public class CacheContainer {
 
   private final VelocityRedisBridge plugin;
-  private final JedisPool jedisPool;
-  private final String uniqueId;
+  private final RedisPlayerDataHandler redisPlayerDataHandler;
+  private final IpDataHandler ipDataHandler;
 
   private final ReentrantLock lock = new ReentrantLock();
-
-  private RedisPlayerDataHandler redisPlayerDataHandler;
-  private IpDataFetcher ipDataFetcher;
 
   private UnifiedPlayerCache unifiedPlayerCache;
   private UnifiedIPCache unifiedIPCache;
@@ -25,15 +21,8 @@ public class CacheContainer {
   public void updateCache() {
     lock.lock();
     try {
-      if (redisPlayerDataHandler == null) {
-        redisPlayerDataHandler = new RedisPlayerDataHandler(plugin, jedisPool, uniqueId);
-      }
       unifiedPlayerCache = redisPlayerDataHandler.fetch();
-
-      if (ipDataFetcher == null) {
-        ipDataFetcher = new IpDataFetcher(jedisPool);
-      }
-      unifiedIPCache = ipDataFetcher.fetch();
+      unifiedIPCache = ipDataHandler.fetch();
     } finally {
       lock.unlock();
     }
