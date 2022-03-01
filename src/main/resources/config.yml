@@ -1,7 +1,0 @@
-redis:
-  hostname: "localhost"
-  port: 6379
-  username: "root"
-  password: "password"
-cache-update-interval-seconds: 10
-redis-cache-expire-seconds: 20
