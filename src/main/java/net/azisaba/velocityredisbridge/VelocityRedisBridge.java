@@ -15,7 +15,6 @@ import lombok.Getter;
 import net.azisaba.velocityredisbridge.command.VelocityRedisBridgeCommand;
 import net.azisaba.velocityredisbridge.config.VelocityRedisBridgeConfig;
 import net.azisaba.velocityredisbridge.listener.BungeeCordPluginMessageReceiveListener;
-import net.azisaba.velocityredisbridge.listener.LogTest;
 import net.azisaba.velocityredisbridge.listener.PlayerJoinQuitListener;
 import net.azisaba.velocityredisbridge.listener.ServerListPingListener;
 import net.azisaba.velocityredisbridge.redis.PlayerInfoHandler;
@@ -34,7 +33,8 @@ import redis.clients.jedis.JedisPoolConfig;
 @Getter
 public class VelocityRedisBridge {
 
-  @Getter private static VelocityRedisBridgeAPI api;
+  @Getter
+  private static VelocityRedisBridgeAPI api;
 
   private final ProxyServer proxy;
   private final Logger logger;
@@ -78,7 +78,6 @@ public class VelocityRedisBridge {
                 this, LEGACY_BUNGEE_CHANNEL, MODERN_BUNGEE_CHANNEL));
     proxy.getEventManager().register(this, new PlayerJoinQuitListener(this, uniqueId));
     proxy.getEventManager().register(this, new ServerListPingListener(this));
-    proxy.getEventManager().register(this, new LogTest(uniqueId));
 
     proxy
         .getCommandManager()
@@ -107,7 +106,8 @@ public class VelocityRedisBridge {
   }
 
   @Subscribe
-  public void onProxyShutdown(ProxyShutdownEvent event) {}
+  public void onProxyShutdown(ProxyShutdownEvent event) {
+  }
 
   private JedisPool createJedisPool(VelocityRedisBridgeConfig config) {
     String hostName = config.getRedisConnectionInfo().getHost();
