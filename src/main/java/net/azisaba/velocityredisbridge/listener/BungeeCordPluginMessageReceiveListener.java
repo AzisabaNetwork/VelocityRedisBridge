@@ -151,9 +151,23 @@ public class BungeeCordPluginMessageReceiveListener {
 
       responseData.writeUTF(serverConnection.get().getServerInfo().getName());
     } else if (subChannel.equals("Forward")) {
-      // TODO 後回し
+      String target = receivedData.readUTF();
+      byte[] toForward = prepareForwardMessage(receivedData);
+
+      if (target.equals("ALL")) {
+        for (RegisteredServer rs : plugin.getProxy().getAllServers()) {
+          rs.sendPluginMessage(event.getIdentifier(), toForward);
+        }
+      } else {
+        plugin.getProxy().getServer(target)
+            .ifPresent(conn -> conn.sendPluginMessage(event.getIdentifier(), toForward));
+      }
     } else if (subChannel.equals("ForwardToPlayer")) {
-      // TODO 後回し
+      String playerName = receivedData.readUTF();
+      plugin.getProxy().getPlayer(playerName)
+          .flatMap(Player::getCurrentServer)
+          .ifPresent(server -> server.sendPluginMessage(event.getIdentifier(),
+              prepareForwardMessage(receivedData)));
     } else if (subChannel.equals("UUID")) {
       Player player = connection.getPlayer();
       responseData.writeUTF(player.getUniqueId().toString());
@@ -186,5 +200,18 @@ public class BungeeCordPluginMessageReceiveListener {
 
     connection.sendPluginMessage(event.getIdentifier(), responseData.toByteArray());
     event.setResult(ForwardResult.handled());
+  }
+
+  private byte[] prepareForwardMessage(ByteArrayDataInput in) {
+    String channel = in.readUTF();
+    short messageLength = in.readShort();
+    byte[] message = new byte[messageLength];
+    in.readFully(message);
+
+    ByteArrayDataOutput forwarded = ByteStreams.newDataOutput();
+    forwarded.writeUTF(channel);
+    forwarded.writeShort(messageLength);
+    forwarded.write(message);
+    return forwarded.toByteArray();
   }
 }
