@@ -1,6 +1,7 @@
 package net.azisaba.velocityredisbridge;
 
 import com.velocitypowered.api.proxy.Player;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -160,5 +161,34 @@ public class VelocityRedisBridgeAPI {
    */
   public Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
     return Optional.ofNullable(plugin.getPlayerInfoHandler().get(uuid));
+  }
+
+  /**
+   * Gets PlayerInfo of all players connected to the network
+   *
+   * @return Returns a Collection of the PlayerInfo of all players connected to the network
+   */
+  public Collection<PlayerInfo> getAllPlayerInfo() {
+    return plugin.getPlayerInfoHandler().getAllPlayerInfo().values();
+  }
+
+  /**
+   * Gets PlayerInfo of all players connected to the specified proxy
+   *
+   * @param proxyId the specified proxy id
+   * @return Returns a Collection of the PlayerInfo of all players connected to the specified proxy
+   */
+  public Collection<PlayerInfo> getAllPlayerInfoInProxy(String proxyId) {
+    return plugin.getPlayerInfoHandler().getAllPlayerInfoInProxy(proxyId);
+  }
+
+  /**
+   * Gets PlayerInfo of all players connected to the specified server
+   *
+   * @param childServerName the specified server name
+   * @return Returns a Collection of the PlayerInfo of all players connected to the specified server
+   */
+  public Collection<PlayerInfo> getAllPlayerInfoInChildServer(String childServerName) {
+    return plugin.getPlayerInfoHandler().getAllPlayerInfoInChildServer(childServerName);
   }
 }
