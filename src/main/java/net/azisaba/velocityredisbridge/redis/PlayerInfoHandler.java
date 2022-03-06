@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,6 +28,7 @@ public class PlayerInfoHandler {
 
   private final ReentrantLock lock = new ReentrantLock();
   private final HashMap<UUID, PlayerInfo> playerInfoMap = new HashMap<>();
+  private final HashMap<String, UUID> mcidMap = new HashMap<>();
   private final HashMap<String, Set<PlayerInfo>> playerInfoProxyServerMap = new HashMap<>();
   private final HashMap<String, Set<PlayerInfo>> playerInfoChildServerMap = new HashMap<>();
 
@@ -144,15 +146,14 @@ public class PlayerInfoHandler {
   public PlayerInfo get(String userName) {
     lock.lock();
     try {
-      for (PlayerInfo info : playerInfoMap.values()) {
-        if (info.getUsername().equals(userName)) {
-          return info;
-        }
+      UUID uuid = mcidMap.get(userName.toLowerCase(Locale.ROOT));
+      if (uuid == null) {
+        return null;
       }
+      return playerInfoMap.get(uuid);
     } finally {
       lock.unlock();
     }
-    return null;
   }
 
   public HashMap<UUID, PlayerInfo> getAllPlayerInfo() {
@@ -195,6 +196,7 @@ public class PlayerInfoHandler {
         playerInfoMap.clear();
         playerInfoProxyServerMap.clear();
         playerInfoChildServerMap.clear();
+        mcidMap.clear();
 
         for (String key : jedis.keys(RedisKeys.PLAYERS_KEY_PREFIX + ":*")) {
           String jsonStr = jedis.get(key);
@@ -235,7 +237,6 @@ public class PlayerInfoHandler {
   }
 
   private void updateToNewPlayerInfo(PlayerInfo info) {
-
     PlayerInfo old = playerInfoMap.remove(info.getUuid());
     if (old != null) {
       playerInfoProxyServerMap
@@ -244,6 +245,7 @@ public class PlayerInfoHandler {
       playerInfoChildServerMap
           .getOrDefault(old.getChildServer(), Collections.emptySet())
           .remove(old);
+      mcidMap.remove(old.getUsername());
     }
 
     if (info.getUuid() != null && info.getUsername() == null) {
@@ -263,5 +265,6 @@ public class PlayerInfoHandler {
       playerInfoChildServerMap.put(
           info.getChildServer(), new HashSet<>(Collections.singletonList(info)));
     }
+    mcidMap.put(info.getUsername().toLowerCase(Locale.ROOT), info.getUuid());
   }
 }
