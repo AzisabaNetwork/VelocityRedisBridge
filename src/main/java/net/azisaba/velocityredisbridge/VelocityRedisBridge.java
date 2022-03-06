@@ -26,7 +26,7 @@ import redis.clients.jedis.JedisPoolConfig;
 @Plugin(
     id = "velocity-redis-bridge",
     name = "VelocityRedisBridge",
-    version = "0.0.1-SNAPSHOT",
+    version = "1.0.0",
     url = "https://github.com/AzisabaNetwork/VelocityRedisBridge",
     description = "Plugin to help parallelization of Velocity",
     authors = {"Azisaba Network"})
@@ -107,6 +107,7 @@ public class VelocityRedisBridge {
 
   @Subscribe
   public void onProxyShutdown(ProxyShutdownEvent event) {
+
   }
 
   private JedisPool createJedisPool(VelocityRedisBridgeConfig config) {

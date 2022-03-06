@@ -2,8 +2,10 @@ package net.azisaba.velocityredisbridge;
 
 import com.velocitypowered.api.proxy.Player;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.azisaba.velocityredisbridge.redis.RedisKeys;
+import net.azisaba.velocityredisbridge.util.PlayerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +44,7 @@ public class VelocityRedisBridgeAPI {
    * Transfers the specified player to the specified server. Even if the player is connected to a
    * different proxy, if the proxy is connected to the same redis server, it will be forwarded
    *
-   * @param player the specified player to transfer
+   * @param player     the specified player to transfer
    * @param serverName the server to transfer to
    */
   public void sendPlayer(@NotNull Player player, @NotNull String serverName) {
@@ -75,7 +77,7 @@ public class VelocityRedisBridgeAPI {
    * player
    *
    * @param playerName the specified player name to send the message
-   * @param message the message to send
+   * @param message    the message to send
    */
   public void sendMessageToPlayer(String playerName, String message) {
     Optional<Player> player = plugin.getProxy().getPlayer(playerName);
@@ -126,7 +128,7 @@ public class VelocityRedisBridgeAPI {
    * if the proxy is connected to the same redis server, it will be executed on the player
    *
    * @param playerName the specified player name to kick
-   * @param reason the reason to kick the player
+   * @param reason     the reason to kick the player
    */
   public void kickPlayer(String playerName, String reason) {
     Optional<Player> player = plugin.getProxy().getPlayer(playerName);
@@ -138,5 +140,25 @@ public class VelocityRedisBridgeAPI {
     try (Jedis jedis = jedisPool.getResource()) {
       jedis.publish(RedisKeys.KICK_PLAYER.getKey(), playerName + ":" + reason);
     }
+  }
+
+  /**
+   * Gets PlayerInfo of the player with the specified name
+   *
+   * @param playerName the specified player name
+   * @return Returns the PlayerInfo of the player wrapped in an Optional
+   */
+  public Optional<PlayerInfo> getPlayerInfo(String playerName) {
+    return Optional.ofNullable(plugin.getPlayerInfoHandler().get(playerName));
+  }
+
+  /**
+   * Gets PlayerInfo of the player with the specified UUID
+   *
+   * @param uuid the specified player UUID
+   * @return Returns the PlayerInfo of the player wrapped in an Optional
+   */
+  public Optional<PlayerInfo> getPlayerInfo(UUID uuid) {
+    return Optional.ofNullable(plugin.getPlayerInfoHandler().get(uuid));
   }
 }
