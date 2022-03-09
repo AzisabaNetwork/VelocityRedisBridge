@@ -109,9 +109,6 @@ public class BungeeCordPluginMessageReceiveListener {
     } else if (subChannel.equals("PlayerCount")) {
       String serverNameOrAll = receivedData.readUTF();
       if (serverNameOrAll.equals("ALL")) {
-        plugin
-            .getLogger()
-            .info("PlayerCount: " + plugin.getPlayerInfoHandler().getAllPlayersCount());
         responseData.writeUTF("ALL");
         responseData.writeInt(plugin.getPlayerInfoHandler().getAllPlayersCount());
       } else {
