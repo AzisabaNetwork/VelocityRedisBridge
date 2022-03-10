@@ -222,7 +222,7 @@ public class PlayerInfoHandler {
               new PlayerInfo(
                   player.getUniqueId(),
                   player.getUsername(),
-                  player.getRemoteAddress().getHostName(),
+                  player.getRemoteAddress().getAddress().getHostAddress(),
                   player.getRemoteAddress().getPort(),
                   proxyId,
                   player

@@ -22,7 +22,7 @@ public class PlayerJoinQuitListener {
   public void onJoin(LoginEvent event) {
     UUID uuid = event.getPlayer().getUniqueId();
     String userName = event.getPlayer().getUsername();
-    String hostName = event.getPlayer().getRemoteAddress().getHostName();
+    String hostName = event.getPlayer().getRemoteAddress().getAddress().getHostAddress();
     int port = event.getPlayer().getRemoteAddress().getPort();
 
     boolean result =
