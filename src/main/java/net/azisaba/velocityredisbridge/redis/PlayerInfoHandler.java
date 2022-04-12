@@ -199,10 +199,21 @@ public class PlayerInfoHandler {
         mcidMap.clear();
 
         for (String key : jedis.keys(RedisKeys.PLAYERS_KEY_PREFIX + ":*")) {
-          String jsonStr = jedis.get(key);
-          PlayerInfo info = gson.fromJson(jsonStr, PlayerInfo.class);
+          try {
+            String jsonStr = jedis.get(key);
+            PlayerInfo info = gson.fromJson(jsonStr, PlayerInfo.class);
 
-          updateToNewPlayerInfo(info);
+            if (info.getUuid() == null) {
+              info.setUuid(UUID.fromString(
+                  key.substring(RedisKeys.PLAYERS_KEY_PREFIX.getKey().length() + 1)));
+            }
+
+            updateToNewPlayerInfo(info);
+
+          } catch (Exception e) {
+            plugin.getLogger().warning("Failed to parse PlayerInfo from redis: " + key);
+            e.printStackTrace();
+          }
         }
       }
     } finally {
