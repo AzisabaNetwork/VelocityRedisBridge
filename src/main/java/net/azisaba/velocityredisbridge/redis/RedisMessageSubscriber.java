@@ -1,6 +1,7 @@
 package net.azisaba.velocityredisbridge.redis;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.azisaba.velocityredisbridge.VelocityRedisBridge;
 import net.azisaba.velocityredisbridge.util.PlayerInfo;
+import net.azisaba.velocityredisbridge.util.PubSubMessageData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import redis.clients.jedis.Jedis;
@@ -88,6 +90,13 @@ public class RedisMessageSubscriber {
               PlayerInfo info = gson.fromJson(message, PlayerInfo.class);
               if (info != null) {
                 plugin.getPlayerInfoHandler().receivedUpdateNotify(info);
+              }
+            } else if (channel.equals(RedisKeys.PUB_SUB_KEY.getKey())) {
+              try {
+                plugin.getVrbPubSubHandler()
+                    .execute(gson.fromJson(message, PubSubMessageData.class));
+              } catch (JsonSyntaxException e) {
+                e.printStackTrace();
               }
             }
           }

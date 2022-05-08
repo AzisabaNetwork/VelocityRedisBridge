@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.azisaba.velocityredisbridge.redis.RedisKeys;
 import net.azisaba.velocityredisbridge.util.PlayerInfo;
+import net.azisaba.velocityredisbridge.redis.VRBPubSubHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,8 @@ public class VelocityRedisBridgeAPI {
 
   private final VelocityRedisBridge plugin;
   private final JedisPool jedisPool;
+
+  private final VRBPubSubHandler pubSubHandler;
 
   /**
    * Transfers the specified player to the specified server. Even if the player is connected to a
@@ -190,5 +193,16 @@ public class VelocityRedisBridgeAPI {
    */
   public Collection<PlayerInfo> getAllPlayerInfoInChildServer(String childServerName) {
     return plugin.getPlayerInfoHandler().getAllPlayerInfoInChildServer(childServerName);
+  }
+
+  /**
+   * Returns a handler instance for PubSub function that can send messages to other Velocity
+   * instances
+   *
+   * @return Returns a handler instance for PubSub function that can send messages to other Velocity
+   * instances
+   */
+  public VRBPubSubHandler getPubSubHandler() {
+    return pubSubHandler;
   }
 }

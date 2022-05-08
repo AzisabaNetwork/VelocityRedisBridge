@@ -20,6 +20,7 @@ import net.azisaba.velocityredisbridge.listener.ServerListPingListener;
 import net.azisaba.velocityredisbridge.redis.PlayerInfoHandler;
 import net.azisaba.velocityredisbridge.redis.RedisMessageSubscriber;
 import net.azisaba.velocityredisbridge.redis.ServerUniqueIdDefiner;
+import net.azisaba.velocityredisbridge.redis.VRBPubSubHandler;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -43,6 +44,7 @@ public class VelocityRedisBridge {
   private PlayerInfoHandler playerInfoHandler;
 
   private RedisMessageSubscriber redisMessageSubscriber;
+  private VRBPubSubHandler vrbPubSubHandler;
 
   private static final LegacyChannelIdentifier LEGACY_BUNGEE_CHANNEL =
       new LegacyChannelIdentifier("BungeeCord");
@@ -87,6 +89,8 @@ public class VelocityRedisBridge {
 
     proxy.getChannelRegistrar().register(new LegacyChannelIdentifier("BungeeCord"));
 
+    vrbPubSubHandler = new VRBPubSubHandler(jedisPool, uniqueId);
+
     redisMessageSubscriber = new RedisMessageSubscriber(this, jedisPool);
     redisMessageSubscriber.subscribe();
 
@@ -102,7 +106,7 @@ public class VelocityRedisBridge {
         .repeat(getVelocityRedisBridgeConfig().getCacheUpdateIntervalSeconds(), TimeUnit.SECONDS)
         .schedule();
 
-    api = new VelocityRedisBridgeAPI(this, jedisPool);
+    api = new VelocityRedisBridgeAPI(this, jedisPool, vrbPubSubHandler);
   }
 
   @Subscribe
