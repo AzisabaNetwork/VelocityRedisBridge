@@ -29,7 +29,7 @@ import redis.clients.jedis.JedisPoolConfig;
 @Plugin(
     id = "velocity-redis-bridge",
     name = "VelocityRedisBridge",
-    version = "1.0.0",
+    version = "2.0.0",
     url = "https://github.com/AzisabaNetwork/VelocityRedisBridge",
     description = "Plugin to help parallelization of Velocity",
     authors = {"Azisaba Network"})
