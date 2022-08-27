@@ -10,6 +10,7 @@ public enum RedisKeys {
   // K/V keys
   PLAYERS_KEY_PREFIX("velocity-redis-bridge:player"),
   IP_KEY_PREFIX("velocity-redis-bridge:ip"),
+  SERVER_ID_PREFIX("velocity-redis-bridge:server"),
 
   // Pub/Sub Keys
   SEND_SERVER_REQUEST("velocity-redis-bridge:send-request"),

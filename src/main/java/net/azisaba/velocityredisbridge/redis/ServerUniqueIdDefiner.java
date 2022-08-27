@@ -22,9 +22,13 @@ public class ServerUniqueIdDefiner {
 
     String id = null;
     try {
-      while (id == null || jedis.keys(RedisKeys.PLAYERS_KEY_PREFIX + ":" + id + ":*").size() > 0) {
+      boolean success = false;
+      while (!success) {
         id = RandomStringUtils.randomAlphanumeric(8);
+        success = jedis.setnx(RedisKeys.SERVER_ID_PREFIX + ":" + id, "using") != 0;
       }
+
+      jedis.expire(RedisKeys.SERVER_ID_PREFIX + ":" + id, 600);
     } finally {
       jedis.close();
     }

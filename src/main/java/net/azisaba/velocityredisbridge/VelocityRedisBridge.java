@@ -18,9 +18,11 @@ import net.azisaba.velocityredisbridge.listener.BungeeCordPluginMessageReceiveLi
 import net.azisaba.velocityredisbridge.listener.PlayerJoinQuitListener;
 import net.azisaba.velocityredisbridge.listener.ServerListPingListener;
 import net.azisaba.velocityredisbridge.redis.PlayerInfoHandler;
+import net.azisaba.velocityredisbridge.redis.RedisKeys;
 import net.azisaba.velocityredisbridge.redis.RedisMessageSubscriber;
 import net.azisaba.velocityredisbridge.redis.ServerUniqueIdDefiner;
 import net.azisaba.velocityredisbridge.redis.VRBPubSubHandler;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -70,6 +72,7 @@ public class VelocityRedisBridge {
     JedisPool jedisPool = createJedisPool(velocityRedisBridgeConfig);
 
     String uniqueId = new ServerUniqueIdDefiner(jedisPool).define();
+    runKeepServerIdTask(jedisPool, uniqueId);
 
     playerInfoHandler = new PlayerInfoHandler(this, jedisPool, uniqueId);
     proxy
@@ -128,5 +131,19 @@ public class VelocityRedisBridge {
     } else {
       return new JedisPool(new JedisPoolConfig(), hostName, port);
     }
+  }
+
+  private void runKeepServerIdTask(JedisPool jedisPool, String serverId) {
+    proxy
+        .getScheduler()
+        .buildTask(
+            this,
+            () -> {
+              try (Jedis jedis = jedisPool.getResource()) {
+                jedis.expire(RedisKeys.SERVER_ID_PREFIX + ":" + serverId, 600);
+              }
+            })
+        .repeat(5, TimeUnit.MINUTES)
+        .schedule();
   }
 }
