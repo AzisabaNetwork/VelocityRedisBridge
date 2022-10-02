@@ -39,7 +39,11 @@ public class PlayerJoinQuitListener {
   @Subscribe
   public void onQuit(DisconnectEvent event) {
     UUID uuid = event.getPlayer().getUniqueId();
-    plugin.getPlayerInfoHandler().unregister(uuid);
+    PlayerInfo info = plugin.getPlayerInfoHandler().get(uuid);
+
+    if (info.getProxyServer() != null && info.getProxyServer().equals(proxyId)) {
+      plugin.getPlayerInfoHandler().unregister(uuid);
+    }
   }
 
   @Subscribe
