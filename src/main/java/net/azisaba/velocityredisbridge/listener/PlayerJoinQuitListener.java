@@ -3,6 +3,7 @@ package net.azisaba.velocityredisbridge.listener;
 import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.DisconnectEvent.LoginStatus;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import java.util.UUID;
@@ -38,6 +39,10 @@ public class PlayerJoinQuitListener {
 
   @Subscribe
   public void onQuit(DisconnectEvent event) {
+    if (event.getLoginStatus() != LoginStatus.SUCCESSFUL_LOGIN) {
+      return;
+    }
+
     UUID uuid = event.getPlayer().getUniqueId();
     PlayerInfo info = plugin.getPlayerInfoHandler().get(uuid);
 
