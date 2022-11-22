@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.azisaba.velocityredisbridge.redis.RedisKeys;
-import net.azisaba.velocityredisbridge.util.PlayerInfo;
 import net.azisaba.velocityredisbridge.redis.VRBPubSubHandler;
+import net.azisaba.velocityredisbridge.util.PlayerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -52,12 +52,11 @@ public class VelocityRedisBridgeAPI {
    * @param serverName the server to transfer to
    */
   public void sendPlayer(@NotNull Player player, @NotNull String serverName) {
-    if (!player.getCurrentServer().isPresent()) {
+    if (player.getCurrentServer().isEmpty()) {
       // The player is offline.
       return;
     }
 
-    plugin.getProxy().getServer(serverName).ifPresent(player::createConnectionRequest);
     plugin
         .getProxy()
         .getServer(serverName)
