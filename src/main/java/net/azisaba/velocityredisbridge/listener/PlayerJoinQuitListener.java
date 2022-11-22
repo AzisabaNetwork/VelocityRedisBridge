@@ -39,7 +39,9 @@ public class PlayerJoinQuitListener {
 
   @Subscribe
   public void onQuit(DisconnectEvent event) {
-    if (event.getLoginStatus() != LoginStatus.SUCCESSFUL_LOGIN) {
+    plugin.getLogger().info(event.getLoginStatus().name());
+    if (event.getLoginStatus() != LoginStatus.SUCCESSFUL_LOGIN
+        && event.getLoginStatus() != LoginStatus.PRE_SERVER_JOIN) {
       return;
     }
 
