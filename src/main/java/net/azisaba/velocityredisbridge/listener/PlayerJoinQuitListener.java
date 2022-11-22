@@ -1,5 +1,6 @@
 package net.azisaba.velocityredisbridge.listener;
 
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent.ComponentResult;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -19,27 +20,29 @@ public class PlayerJoinQuitListener {
   private final VelocityRedisBridge plugin;
   private final String proxyId;
 
-  @Subscribe
+  @Subscribe(order = PostOrder.LAST)
   public void onJoin(LoginEvent event) {
+    if (!event.getResult().isAllowed()) {
+      return;
+    }
+
     UUID uuid = event.getPlayer().getUniqueId();
     String userName = event.getPlayer().getUsername();
     String hostName = event.getPlayer().getRemoteAddress().getAddress().getHostAddress();
     int port = event.getPlayer().getRemoteAddress().getPort();
 
-    boolean result =
-        plugin
-            .getPlayerInfoHandler()
-            .register(new PlayerInfo(uuid, userName, hostName, port, proxyId, null));
+    boolean result = plugin.getPlayerInfoHandler()
+        .register(new PlayerInfo(uuid, userName, hostName, port, proxyId, null));
 
     if (!result) {
       event.setResult(
-          ComponentResult.denied(Component.text("あなたは既にサーバーに参加しています！").color(NamedTextColor.RED)));
+          ComponentResult.denied(
+              Component.text("あなたは既にサーバーに参加しています！").color(NamedTextColor.RED)));
     }
   }
 
   @Subscribe
   public void onQuit(DisconnectEvent event) {
-    plugin.getLogger().info(event.getLoginStatus().name());
     if (event.getLoginStatus() != LoginStatus.SUCCESSFUL_LOGIN
         && event.getLoginStatus() != LoginStatus.PRE_SERVER_JOIN) {
       return;
@@ -48,6 +51,9 @@ public class PlayerJoinQuitListener {
     UUID uuid = event.getPlayer().getUniqueId();
     PlayerInfo info = plugin.getPlayerInfoHandler().get(uuid);
 
+    if (info == null) {
+      return;
+    }
     if (info.getProxyServer() != null && info.getProxyServer().equals(proxyId)) {
       plugin.getPlayerInfoHandler().unregister(uuid);
     }
