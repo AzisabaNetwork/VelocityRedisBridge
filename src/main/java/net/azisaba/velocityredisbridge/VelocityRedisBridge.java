@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import lombok.Getter;
 import net.azisaba.velocityredisbridge.command.VelocityRedisBridgeCommand;
 import net.azisaba.velocityredisbridge.config.VelocityRedisBridgeConfig;
+import net.azisaba.velocityredisbridge.external.ExternalServerPingHandler;
 import net.azisaba.velocityredisbridge.listener.BungeeCordPluginMessageReceiveListener;
 import net.azisaba.velocityredisbridge.listener.PlayerJoinQuitListener;
 import net.azisaba.velocityredisbridge.listener.ServerListPingListener;
@@ -44,6 +45,7 @@ public class VelocityRedisBridge {
 
   private VelocityRedisBridgeConfig velocityRedisBridgeConfig;
   private PlayerInfoHandler playerInfoHandler;
+  private ExternalServerPingHandler externalServerPingHandler;
 
   private RedisMessageSubscriber redisMessageSubscriber;
   private VRBPubSubHandler vrbPubSubHandler;
@@ -75,6 +77,13 @@ public class VelocityRedisBridge {
     runKeepServerIdTask(jedisPool, uniqueId);
 
     playerInfoHandler = new PlayerInfoHandler(this, jedisPool, uniqueId);
+
+    externalServerPingHandler =
+        new ExternalServerPingHandler(
+            this, velocityRedisBridgeConfig.getExternalServerAddresses());
+    externalServerPingHandler.start(
+        velocityRedisBridgeConfig.getExternalServerPingIntervalSeconds());
+
     proxy
         .getEventManager()
         .register(

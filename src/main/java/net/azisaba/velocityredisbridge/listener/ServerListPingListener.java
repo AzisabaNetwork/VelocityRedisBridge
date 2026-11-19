@@ -16,7 +16,9 @@ public class ServerListPingListener {
         event
             .getPing()
             .asBuilder()
-            .onlinePlayers(plugin.getPlayerInfoHandler().getAllPlayersCount())
+            .onlinePlayers(
+                plugin.getPlayerInfoHandler().getAllPlayersCount()
+                    + plugin.getExternalServerPingHandler().getTotalPlayerCount())
             .build());
   }
 }
