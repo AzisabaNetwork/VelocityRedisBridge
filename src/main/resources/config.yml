@@ -5,3 +5,11 @@ redis:
   password: "password"
 cache-update-interval-seconds: 10
 redis-cache-expire-seconds: 20
+# Servers outside the Velocity network to ping.
+# Their online player counts are added to the count returned by
+# the server list ping and the BungeeCord "PlayerCount" (ALL) message.
+external-servers:
+  ping-interval-seconds: 10
+  addresses: []
+  # addresses:
+  #   - "example.com:25565"

@@ -110,7 +110,9 @@ public class BungeeCordPluginMessageReceiveListener {
       String serverNameOrAll = receivedData.readUTF();
       if (serverNameOrAll.equals("ALL")) {
         responseData.writeUTF("ALL");
-        responseData.writeInt(plugin.getPlayerInfoHandler().getAllPlayersCount());
+        responseData.writeInt(
+            plugin.getPlayerInfoHandler().getAllPlayersCount()
+                + plugin.getExternalServerPingHandler().getTotalPlayerCount());
       } else {
         responseData.writeUTF(serverNameOrAll);
         responseData.writeInt(plugin.getPlayerInfoHandler().getPlayersCount(serverNameOrAll));

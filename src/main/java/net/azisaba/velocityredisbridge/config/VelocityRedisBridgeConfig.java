@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -32,6 +34,9 @@ public class VelocityRedisBridgeConfig {
 
   private long cacheUpdateIntervalSeconds;
   private long redisCacheExpireSeconds;
+
+  private List<String> externalServerAddresses = new ArrayList<>();
+  private long externalServerPingIntervalSeconds = 10;
 
   public void load() throws IOException {
     File file = new File(CONFIG_FILE_PATH);
@@ -65,6 +70,22 @@ public class VelocityRedisBridgeConfig {
       redisCacheExpireSeconds = (Integer) data.get("redis-cache-expire-seconds");
     } else if (data.get("redis-cache-expire-seconds") instanceof Long) {
       redisCacheExpireSeconds = (Long) data.get("redis-cache-expire-seconds");
+    }
+
+    externalServerAddresses = new ArrayList<>();
+    if (data.get("external-servers") instanceof Map) {
+      Map<String, Object> externalServers = dig(data, "external-servers");
+      if (externalServers.get("ping-interval-seconds") instanceof Number) {
+        externalServerPingIntervalSeconds =
+            ((Number) externalServers.get("ping-interval-seconds")).longValue();
+      }
+      if (externalServers.get("addresses") instanceof List) {
+        for (Object address : (List<?>) externalServers.get("addresses")) {
+          if (address != null && !address.toString().isBlank()) {
+            externalServerAddresses.add(address.toString().trim());
+          }
+        }
+      }
     }
   }
 
