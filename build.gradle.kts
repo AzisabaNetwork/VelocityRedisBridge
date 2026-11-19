@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "net.azisaba"
-version = "2.0.4"
+version = "2.1.0"
 description = "Plugin to help parallelization of Velocity."
 
 repositories {
