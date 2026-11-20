@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import lombok.Getter;
+import net.azisaba.velocityredisbridge.command.PlayerCountCommand;
 import net.azisaba.velocityredisbridge.command.VelocityRedisBridgeCommand;
 import net.azisaba.velocityredisbridge.config.VelocityRedisBridgeConfig;
 import net.azisaba.velocityredisbridge.external.ExternalServerPingHandler;
@@ -98,6 +99,11 @@ public class VelocityRedisBridge {
         .register(
             proxy.getCommandManager().metaBuilder("velocityredisbridge").aliases("vrb").build(),
             new VelocityRedisBridgeCommand(uniqueId));
+    proxy
+        .getCommandManager()
+        .register(
+            proxy.getCommandManager().metaBuilder("vrbplayercount").aliases("vrbcount").build(),
+            new PlayerCountCommand(this));
 
     proxy.getChannelRegistrar().register(new LegacyChannelIdentifier("BungeeCord"));
 

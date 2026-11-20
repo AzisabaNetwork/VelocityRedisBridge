@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import java.net.InetSocketAddress;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,8 @@ import net.azisaba.velocityredisbridge.VelocityRedisBridge;
  * Periodically pings servers outside the Velocity network and caches their online player counts.
  */
 public class ExternalServerPingHandler {
+
+  private static final String NAME_PREFIX = "vrb-external-";
 
   private final VelocityRedisBridge plugin;
   private final List<RegisteredServer> targets;
@@ -34,7 +37,7 @@ public class ExternalServerPingHandler {
                         .getProxy()
                         .createRawRegisteredServer(
                             new ServerInfo(
-                                "vrb-external-"
+                                NAME_PREFIX
                                     + address.getHostString()
                                     + ":"
                                     + address.getPort(),
@@ -85,6 +88,19 @@ public class ExternalServerPingHandler {
   /** Returns the total number of players on all reachable external servers. */
   public int getTotalPlayerCount() {
     return playerCounts.values().stream().mapToInt(Integer::intValue).sum();
+  }
+
+  /**
+   * Returns the latest player count of each configured external server, keyed by "host:port", in
+   * configuration order. The value is {@code null} if the server has not responded successfully.
+   */
+  public Map<String, Integer> getPlayerCountsByServer() {
+    Map<String, Integer> result = new LinkedHashMap<>();
+    for (RegisteredServer server : targets) {
+      String name = server.getServerInfo().getName();
+      result.put(name.substring(NAME_PREFIX.length()), playerCounts.get(name));
+    }
+    return result;
   }
 
   private static InetSocketAddress parseAddress(String address) {
