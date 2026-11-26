@@ -15,7 +15,7 @@ repositories {
 dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
     annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
-    implementation("redis.clients:jedis:8.0.2")
+    implementation("redis.clients:jedis:8.1.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
 
     compileOnly("org.projectlombok:lombok:1.18.48")
